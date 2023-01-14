@@ -36,4 +36,33 @@ if df is not None:
     m= Prophet()
     m.fit(data)
 
+#step 3: Visualize Forecast Data
 
+if df is not None:
+    future = m.make_future_dataframe(periods= periods_input)
+
+    forecast = m.predict(future)
+    fcst = forecast[['ds','yhat','yhat_lower','yhat_upper']]
+
+    fcst_filtered = fcst[fcst['ds']>max_date]
+    st.write(fcst_filtered)
+
+"The next something something "
+
+fig1 = m.plot(forecast)
+st.write(fig1)
+
+fig2= m.plot_components(forecast)
+st.write(fig2)
+
+
+#step 4: Download the Forecast Data
+
+if df is not None:
+        csv_exp=fcst_filtered.to_csv(index=False)
+        # Encode the csv_exp variable to base64
+        csv_exp_base64 = base64.b64encode(csv_exp.encode())
+        # Decode the base64 bytes to a string
+        csv_exp_base64 = csv_exp_base64.decode()
+        href=f'<a href="data:file/csv ;base64,{csv_exp_base64}">Download CSV File </a>(right- click and save as &lt;forecast_name&gt;.csv)'
+        st.markdown(href,unsafe_allow_html=True)
